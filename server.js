@@ -6,7 +6,7 @@ require('dotenv').config();
 const app = express();
 
 // Configure CORS
-const allowedOrigins = ['https://theblockchain.vercel.app'];
+const allowedOrigins = ['https://theblockchain.vercel.app/'];
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
