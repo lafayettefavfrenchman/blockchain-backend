@@ -6,7 +6,7 @@ require('dotenv').config();
 const app = express();
 
 // Configure CORS
-const allowedOrigins = ['https://theblockchain.vercel.app/'];
+//const allowedOrigins = ['https://theblockchain.vercel.app/'];
 // app.use(cors({
 //   origin: (origin, callback) => {
 //     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
@@ -16,7 +16,16 @@ const allowedOrigins = ['https://theblockchain.vercel.app/'];
 //     }
 //   }
 // }));
-app.use(cors({origin:'https://theblockchain.vercel.app/'}))
+const allowedOrigins = ['https://theblockchain.vercel.app'];
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+    methods: "POST",
+    optionsSuccessStatus: 200,
+  })
+);
 app.use(express.json());
 
 // MongoDB connection
