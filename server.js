@@ -16,7 +16,7 @@ const app = express();
 //     }
 //   }
 // }));
-const allowedOrigins = ['https://theblockchain.vercel.app'];
+const allowedOrigins = ['https://theblockchain.vercel.app','*'];
 
 app.use(
   cors({
