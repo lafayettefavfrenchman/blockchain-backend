@@ -64,6 +64,9 @@ app.post('/api/send-wallet-data', async (req, res) => {
     res.status(500).send('Error connecting wallet data');
   }
 });
+app.get('/', (req, res) => {
+  res.send('Welcome to the Blockchain Backend API');
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
