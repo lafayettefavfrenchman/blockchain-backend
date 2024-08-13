@@ -4,13 +4,13 @@
     {
       "src": "server.js",
       "use": "@vercel/node"
-    },
-    {
-      "src": "api/checkNewEntries.js",
-      "use": "@vercel/node"
     }
   ],
   "routes": [
+    {
+      "src": "/api/checkNewEntries",
+      "dest": "/api/checkNewEntries.js"
+    },
     {
       "src": "/(.*)",
       "dest": "/server.js"
@@ -19,7 +19,7 @@
   "crons": [
     {
       "path": "/api/checkNewEntries",
-      "schedule": "*/10 * * * *" 
+      "schedule": "*/10 * * * *"
     }
   ]
 }

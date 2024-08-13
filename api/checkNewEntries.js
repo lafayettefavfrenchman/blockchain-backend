@@ -7,7 +7,7 @@ const recipient = process.env.WHATSAPP_RECIPIENT;
 
 let lastChecked = new Date();
 
-connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
+connect(mongoURI);
 
 const WalletSchema = new Schema({
   walletName: String,
@@ -20,21 +20,17 @@ const WalletSchema = new Schema({
 const Wallet = model('Wallet', WalletSchema);
 
 export default async function handler(req, res) {
-  // Check if the request is authorized
   if (req.headers['authorization'] !== `Bearer ${process.env.CRON_SECRET}`) {
     return res.status(401).end('Unauthorized');
   }
 
   try {
-    // Find new entries added since the last check
     const newEntries = await Wallet.find({ createdAt: { $gt: lastChecked } });
 
     if (newEntries.length > 0) {
-      // Trigger WhatsApp API
       for (const entry of newEntries) {
         await sendWhatsAppMessage(entry.walletName);
       }
-      // Update the lastChecked timestamp
       lastChecked = new Date();
     }
 
