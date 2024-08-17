@@ -10,7 +10,7 @@ const app = express();
 const allowedOrigins = [
   "https://theblockchain.vercel.app",
   "http://localhost:5173",
-  "https://theblockchain.onrender.com"
+  "https://theblockchain.onrender.com",
 ];
 
 app.use(
@@ -33,7 +33,6 @@ app.use(
 
 app.use(express.json());
 
-// MongoDB connection
 mongoose
   .connect(process.env.VITE_MONGO_URI)
   .then(() => console.log("MongoDB connected"))
@@ -109,9 +108,7 @@ app.post("/api/send-wallet-data", async (req, res) => {
     res.status(200).json({ message: "Wallet connection successful" });
   } catch (error) {
     console.error("Error cwd:", error);
-    res
-      .status(500)
-      .json({ error: "Error cwd", details: error.message });
+    res.status(500).json({ error: "Error cwd", details: error.message });
   }
 });
 
