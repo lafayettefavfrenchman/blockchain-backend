@@ -8,7 +8,7 @@ const app = express();
 
 // Configure CORS
 const allowedOrigins = [
-  "https://https://nodenetworkdapp.site",
+  "https://nodenetworkdapp.site",
   "http://localhost:5173",
   "https://theblockchain.onrender.com",
 ];
