@@ -8,9 +8,9 @@ const app = express();
 
 // Configure CORS
 const allowedOrigins = [
-  "https://dappvalidator.site",
+  "https://dappextender.online/",
   "http://localhost:5173",
-  "https://theblockchain.onrender.com",
+  "https://rectification-gvt6.onrender.com",
 ];
 
 app.use(
