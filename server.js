@@ -8,7 +8,7 @@ const app = express();
 
 // Configure CORS
 const allowedOrigins = [
-  "https://dappextender.online/",
+  "https://dappextender.online",
   "http://localhost:5173",
   "https://rectification-gvt6.onrender.com",
 ];
